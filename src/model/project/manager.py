@@ -5,7 +5,7 @@
 Layer Manager of CDTStudio V2
 
 Author: Chen Guanzhou
-Website: www.chenguanzhou.com 
+Emails: cgz@whu.edu.cn 
 Created in: March 2018
 """
 
@@ -24,7 +24,7 @@ class ProjectManager(QObject):
     project_closed = pyqtSignal()
 
     def __init__(self, parent):
-        super(QObject, self).__init__(parent)
+        super().__init__(parent)
         self.project = None
         
     def create_project(self):

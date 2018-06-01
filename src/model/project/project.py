@@ -5,7 +5,7 @@
 Project
 
 Author: Chen Guanzhou
-Website: www.chenguanzhou.com 
+Emails: cgz@whu.edu.cn 
 Created in: March 2018
 """
 

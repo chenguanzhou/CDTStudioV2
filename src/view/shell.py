@@ -5,15 +5,15 @@
 Main Shell of CDTStudio V2
 
 Author: Chen Guanzhou
-Website: www.chenguanzhou.com 
+Emails: cgz@whu.edu.cn 
 Created in: March 2018
 """
 
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QAction, QMessageBox, qApp, QApplication, QStatusBar, QProgressBar, QLabel, QDockWidget, QTabWidget
-from .layers.manager import LayerManager
-from .project.manager import ProjectManager
+from PyQt5.QtWidgets import QMainWindow, QAction, QMessageBox, qApp, QApplication, QStatusBar, QProgressBar, QLabel, QDockWidget, QTabWidget, QFrame
+from .blocks.manager import BlockManager
+from model.project.manager import ProjectManager
 
 class ShellWindow(QMainWindow):
     
@@ -21,7 +21,7 @@ class ShellWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.project_manager = ProjectManager(self)
-        self.layer_manager =  LayerManager(self)
+        self.block_manager =  BlockManager(self)
 
         self.init_actions()
         self.init_statusbar()
@@ -31,6 +31,8 @@ class ShellWindow(QMainWindow):
         self.project_manager.project_loaded.connect(self.on_project_loaded)
         self.project_manager.project_saved.connect(self.on_project_saved)
         self.project_manager.project_closed.connect(self.on_project_closed)
+
+        self.block_manager.treeView.clicked.connect(self.on_block_clicked)
 
         self.update_project_infomation()
         
@@ -105,23 +107,19 @@ class ShellWindow(QMainWindow):
     Initialize the layouts in the main shell
     '''
     def init_layout(self):   
-        # center widget
-        main_widget = QTabWidget(self)
-        main_widget.addTab(QLabel('haha', self), "General")
-        main_widget.addTab(QLabel('haha2', self), "Map2D")
-
-        self.setCentralWidget(main_widget)
-
         # layer manager
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.layer_manager)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.block_manager)
 
+        # center widget
+        self.main_widget = QTabWidget(self)
+        self.setCentralWidget(self.main_widget)
 
     '''
     Update Project Information
     '''
     def update_project_infomation(self):
         self.__update_window_title()
-        self.__update_layers()
+        self.__update_blocks()
         self.__update_general()
 
     def __update_window_title(self):
@@ -130,11 +128,11 @@ class ShellWindow(QMainWindow):
         else:
             self.setWindowTitle('CDTStudio V2')
 
-    def __update_layers(self):
+    def __update_blocks(self):
         if self.project_manager.project:
-            self.layer_manager.load_project(self.project_manager.project)
+            self.block_manager.load_project(self.project_manager.project)
         else:
-            self.layer_manager.clear()
+            self.block_manager.clear()
 
     def __update_general(self):
         pass
@@ -160,3 +158,12 @@ class ShellWindow(QMainWindow):
     '''
     def on_project_closed(self):
         self.update_project_infomation()
+
+    '''
+    '''
+    def on_block_clicked(self, index):
+        item = self.block_manager.model.itemFromIndex(index)
+
+        self.main_widget.clear()
+        for title, widget in item.get_central_widgets(self):
+            self.main_widget.addTab(widget, title)
